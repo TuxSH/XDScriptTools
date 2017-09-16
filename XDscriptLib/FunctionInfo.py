@@ -1,4 +1,4 @@
-﻿# See LICENSE for license
+# See LICENSE for license
 """
 FunctionInfo
 
@@ -258,9 +258,14 @@ classes = (
 		FunctionInfo(name = "setVisibility", index = 16, nbParams = 2, variadic = False), # (int visible)
 		FunctionInfo(name = "displayMsgWithSpeciesSound", index = 21, nbParams = 2, variadic = False), # (int msgID, int unk ?)
 		# Uses the species cry from Dialogs::setMsgVar($dialogs, 50, species)
+			
+		FunctionInfo(name= "playerIsInRange", index = 27, nbParams = 4, variadic = False), # (int x, int y, int z, float angle?)
+		FunctionInfo(name= "setPosition", index = 29, nbParams = 3, variadic = False), # (int x, int y, int z)
 
 		FunctionInfo(name = "setCharacterFlags", index = 40, nbParams = 2, variadic = False), # (int flags ?) 
-		FunctionInfo(name = "clearCharacterFlags", index = 41, nbParams = 2, variadic = False), # (int flags ?)  
+		FunctionInfo(name = "clearCharacterFlags", index = 41, nbParams = 2, variadic = False), # (int flags ?)
+													   
+		FunctionInfo(name= "setModel", index = 70, nbParams = 1, variadic = False), # (int ID)
 
 		FunctionInfo(name = "talk", index = 73, nbParams = 2, variadic = True), # (int type, ...)
 		# Some type of character dialogs (total: 22):
@@ -268,6 +273,8 @@ classes = (
 		#	(1, msgID): normal msg
 		#	(2, msgID): the character comes at you, then talks, then goes away (to be verified; anyways he/she moves)
 		#	(8, msgID): yes/no question
+		#   (battleID, 9, msgID): initiates a battle after the speech
+		#   (quantity, itemID, 14, msgID): gives the player a given number of an item. Used for a custom message instead of default "Player received X".
 		#	(15, species): plays the species' cry
 		#	(16, msgID): informative dialog with no sound
 
@@ -280,6 +287,7 @@ classes = (
 		FunctionInfo(name = "playSpecifiedSpeciesCry", index = 16, nbParams = 2, variadic = False), # (int species)
 
 		FunctionInfo(name = "playCry", index = 16, nbParams = 1, variadic = False),
+		FunctionInfo(name = "deleteMove", index = 17, nbParams = 1, variadic = False), # (int move id)
 
 		FunctionInfo(name = "getPokeballCaughtWith", nbParams = 1, index = 21, variadic = False),
 		FunctionInfo(name = "getNickname", nbParams = 1, index = 22, variadic = False),
@@ -296,6 +304,9 @@ classes = (
 		FunctionInfo(name = "getSomeSpeciesRelatedIndex", index = 31, nbParams = 1, variadic = False), # if it's 0 the species is invalid
 		FunctionInfo(name = "getHeldItem", index = 32, nbParams = 1, variadic = False),
 		FunctionInfo(name = "getSIDTID", index = 33, nbParams = 1, variadic = False),
+		
+		FunctionInfo(name = "teachMove", index = 34, nbParams = 1, variadic = False), # (int move id)
+		FunctionInfo(name = "hasLearnedMove", index = 35, nbParams = 1, variadic = False), # (int move id)
 
 
 	)),
@@ -314,14 +325,14 @@ classes = (
 																								  # HEAD sec. must be present
 
 		FunctionInfo(name = "getLastReturnedInt", index = 20, nbParams = 1, variadic = False),
-		FunctionInfo(name = "sleep", index = 21, nbParams = 2, variadic = False) # (float) (miliseconds)
+		FunctionInfo(name = "sleep", index = 21, nbParams = 2, variadic = False), # (float) (miliseconds)
 	)),
 
 	ClassInfo(name = "Dialogs", index = 40, funcs = (
 		#------------------------------------------------------------------------------------
 		Category(name = "Known methods", start = 16, nb=-1),
 
-		FunctionInfo(name = "displatSilentMsgBox", index = 16, nbParams = 4, variadic = False), # (int msgID, int isInForeground, int dontDisplayCharByChar) 
+		FunctionInfo(name = "displaySilentMsgBox", index = 16, nbParams = 4, variadic = False), # (int msgID, int isInForeground, int dontDisplayCharByChar) 
 		FunctionInfo(name = "displayMsgBox", index = 17, nbParams = 5, variadic = False), # (int msgID, int isInForeground, int dontDisplayCharByChar,
 																		# int textSoundPitchLevel)
 		FunctionInfo(name = "displayYesNoQuestion", index = 21, nbParams = 2, variadic = False), # (int msgID)
@@ -338,7 +349,7 @@ classes = (
 
 		FunctionInfo(name = "openPokemartMenu", index = 39, nbParams = 2, variadic = False), # (int)
 		
-		FunctionInfo(name = "openPADMenu", index = 41, nbParams = 1, variadic = False),
+		FunctionInfo(name = "openPDAMenu", index = 41, nbParams = 1, variadic = False),
 		FunctionInfo(name = "yesOrNoPrompt", index = 42, nbParams = 1, variadic = False),
 
 		FunctionInfo(name = "openItemMenu", index = 50, nbParams = 1, variadic = False),
@@ -361,13 +372,28 @@ classes = (
 		FunctionInfo(name = "checkStatus", index = 17, nbParams = 2, variadic = False) #$transition, int waitForCompletion
 	)),
 	
-	ClassInfo(name = "UnknownClass42", index = 42, funcs = (None,)),
+	ClassInfo(name = "Battle", index = 42, funcs = (
+			  
+		FunctionInfo(name = "startBattle", index = 16, nbParams = 3, variadic = False), # (bool isTrainer (maybe), int unk, int battleID) trainer id isn’t index in deck but list is in references folder.
+		FunctionInfo(name = "getBattleResult", index = 18, nbParams = 0, variadic = False) #2 is victory, guess 0 and 1 are lose and draw?
+															
+	)),
+		   
+		   
+		   
 	ClassInfo(name = "Player", index = 43, funcs = (
 		#------------------------------------------------------------------------------------
 		Category(name = "Known methods", start = 16, nb=-1),
 
 		FunctionInfo(name = "processEvents", index = 17, nbParams = 1, variadic = False), # MUST BE CALLED IN THE IDLE LOOP (usually 'hero_main')
 
+		FunctionInfo(name= "lockMovement", index = 18, nbParams = 0, variadic = False),
+		FunctionInfo(name= "freeMovement", index = 19, nbParams = 0, variadic = False),
+													
+		FunctionInfo(name= "receiveItemWithMessage", index = 26, nbParams = 2, variadic = False), # (int amount, int ID)
+		FunctionInfo(name= "receiveItemWithoutMessage", index = 27, nbParams = 2, variadic = False), # (int amount, int ID)
+		FunctionInfo(name= "itemIsInBag", index = 28, nbParams = 1, variadic = False), # (int ID)
+													
 		FunctionInfo(name = "receiveMoney", index = 29, nbParams = 2, variadic = False), # (int amount) (can be < 0)
 		FunctionInfo(name = "getMoney", index = 30, nbParams = 1, variadic = False),
 		
@@ -393,6 +419,8 @@ classes = (
 		FunctionInfo(name = "getPartyPkm", index = 44, nbParams = 2, variadic = False), # (int index)
 		FunctionInfo(name = "checkPkmOwnership", index = 45, nbParams = 2, variadic = False), # (int index)
 
+		FunctionInfo(name= "countCaughtShadowPokemon", index = 49, nbParams = 0, variadic = False), # i.e. 83 in vanilla game
+													
 		FunctionInfo(name = "isPCFull", index = 52, nbParams = 1, variadic = False),
 		FunctionInfo(name = "countLegendaryPartyPkm", index = 53, nbParams = 1, variadic = False),
 
@@ -401,7 +429,7 @@ classes = (
 		FunctionInfo(name = "getPkCoupons", index = 61, nbParams = 1, variadic = False),
 		FunctionInfo(name = "setPkCoupons", index = 62, nbParams = 2, variadic = False), # (int nb)
 		FunctionInfo(name = "receivePkCoupons", index = 63, nbParams = 2, variadic = False), # (int amount) (can be < 0)
-		FunctionInfo(name = "countShadowPkm", index = 64, nbParams = 1, variadic = False),
+		FunctionInfo(name = "countAllShadowPkm", index = 64, nbParams = 1, variadic = False),
 
 		FunctionInfo(name = "isSpeciesInPC", index = 68, nbParams = 2, variadic = False), # (int species)
 		FunctionInfo(name = "releasePartyPkm", index = 69, nbParams = 2, variadic = False), # (int index). Returns 1 iff there was a valid Pokémon, 0 otherwise.
@@ -410,11 +438,23 @@ classes = (
 	)),
 
 	ClassInfo(name = "UnknownClass44", index = 44, funcs = (None,)),
-	ClassInfo(name = "UnknownClass45", index = 45, funcs = (None,)),
+		   
+		   
+	ClassInfo(name = "Pokesnacks", index = 45, funcs = (
+		FunctionInfo(name = "displaySnacks", index = 19, nbParams = 5, variadic = False), #(int,int,int number of snacks,int model id for snacks)
+	)),
+		   
+		   
 	ClassInfo(name = "UnknownClass46", index = 46, funcs = (None,)),
 	ClassInfo(name = "Sound", index = 47, funcs = (None,)),
 	ClassInfo(name = "UnknownClass48", index = 48, funcs = (None,)),
-	ClassInfo(name = "UnknownClass49", index = 49, funcs = (None,)),
+		   
+		   
+	ClassInfo(name = "Mail", index = 49, funcs = (
+			  FunctionInfo(name = "receiveMail", index = 20, nbParams = 1, variadic = False), # ID for mail
+	)),
+		   
+		   
 	ClassInfo(name = "UnknownClass50", index = 50, funcs = (None,)),
 	ClassInfo(name = "UnknownClass51", index = 51, funcs = (None,)),
 
@@ -473,7 +513,11 @@ classes = (
 
 
 	)),
-	ClassInfo(name = "UnknownClass60", index = 60, funcs = (None,))
+	ClassInfo(name = "Pokespot", index = 60, funcs = (
+													  
+		FunctionInfo(name = "getCurrentWildPokemon", index = 17, nbParams = 2, variadic = False),
+													  
+	))
 
 	#------------------------------------------------------------------------------------
 	#======================================================================================
